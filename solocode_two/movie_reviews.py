@@ -7,7 +7,8 @@ class Review:
         self.review = review
 
     def set_rating(self, rating):
-        assert rating > 0 and rating <= 5  # change this later to a better error message
+        if rating < 0 or rating >= 5:
+            raise Exception("Rating outside of range (0-5)")
         return rating
 
     def get_rating(self):
