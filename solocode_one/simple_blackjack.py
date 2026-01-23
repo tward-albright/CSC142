@@ -75,8 +75,6 @@ def main():
     if dealer_score > 21:
         print("Dealer busts!")
         print("Player wins!")
-    elif dealer_score == 21:
-        print("Dealer wins!")
     elif player_score == 21:
         print("Player wins!")
     elif calculate_score(dealer_hand) >= calculate_score(player_hand):
