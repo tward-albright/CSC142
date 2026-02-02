@@ -46,6 +46,11 @@ while True:
             # if it is quit the game
             pygame.quit()
             sys.exit()
+        if event.type == pygame.MOUSEBUTTONUP:
+            mouse_pos = pygame.mouse.get_pos()
+            if ballRect.collidepoint(mouse_pos):
+                player_score += 1
+                print("clicked ball!")
 
     # 8 - Do any "per frame" actions
     if (ballRect.left < 0) or (ballRect.right >= WINDOW_WIDTH):
