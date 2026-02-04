@@ -22,6 +22,7 @@ clock = pygame.time.Clock()
 # 4 - Load assets: image(s), sound(s),  etc.
 ballImage = pygame.image.load("images/ball.png")
 bounceSound = pygame.mixer.Sound("sounds/boing.wav")
+clickSound = pygame.mixer.Sound("sounds/click.mp3")
 # pygame.mixer.music.load("sounds/background.mp3")
 # pygame.mixer.music.play(-1, 0.0)
 
@@ -35,7 +36,17 @@ ballRect.top = random.randrange(MAX_HEIGHT)
 xSpeed = N_PIXELS_PER_FRAME
 ySpeed = N_PIXELS_PER_FRAME
 start_time = pygame.time.get_ticks()
+end_time = 0
 player_score = 0
+
+
+# from Canvas
+def draw_text(surface, text, x, y, color, font_size=24):
+    text_font = pygame.font.SysFont(None, font_size)
+    text_surface = text_font.render(text, True, color)
+    text_rect = text_surface.get_rect()
+    text_rect.topleft = (x, y)
+    surface.blit(text_surface, text_rect)
 
 
 # get the sign of a number
@@ -63,18 +74,20 @@ while True:
                 # using sign so that the ball doesn't always go to the bottom-right after clicked
                 xSpeed = sign(xSpeed) * (abs(xSpeed) + random.randint(1, 5))
                 ySpeed = sign(ySpeed) * (abs(ySpeed) + random.randint(1, 5))
+                clickSound.play()
 
     # 8 - Do any "per frame" actions
-    if (ballRect.left < 0) or (ballRect.right >= WINDOW_WIDTH):
-        xSpeed = -xSpeed  # reverse X direction
-        bounceSound.play()
+    if player_score < 5:
+        if (ballRect.left < 0) or (ballRect.right >= WINDOW_WIDTH):
+            xSpeed = -xSpeed  # reverse X direction
+            bounceSound.play()
 
-    if (ballRect.top < 0) or (ballRect.bottom >= WINDOW_HEIGHT):
-        ySpeed = -ySpeed  # reverse Y direction
-        bounceSound.play()
+        if (ballRect.top < 0) or (ballRect.bottom >= WINDOW_HEIGHT):
+            ySpeed = -ySpeed  # reverse Y direction
+            bounceSound.play()
 
-    if player_score == 5:
-        break
+    if player_score == 5 and end_time == 0:
+        end_time = pygame.time.get_ticks() - start_time
 
     # Update the rectangle of the ball, based on the speed in two directions
     ballRect.left = ballRect.left + xSpeed
@@ -84,8 +97,19 @@ while True:
     window.fill(BLACK)
 
     # 10 - Draw the window elements
-    window.blit(ballImage, ballRect)
+    if player_score < 5:
+        window.blit(ballImage, ballRect)
+    else:
+        draw_text(
+            window,
+            f"Time: {end_time / 1000:.2f}s",
+            MAX_WIDTH // 2 - 32,
+            MAX_HEIGHT // 2,
+            (255, 255, 255),
+            48,
+        )
 
+    draw_text(window, f"Score: {player_score}", 0, 0, (255, 255, 255), 32)
     # 11 - Update the window
     pygame.display.update()
 
