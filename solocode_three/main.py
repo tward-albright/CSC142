@@ -37,6 +37,14 @@ ySpeed = N_PIXELS_PER_FRAME
 start_time = pygame.time.get_ticks()
 player_score = 0
 
+
+# get the sign of a number
+def sign(n):
+    if n >= 0:
+        return 1
+    return -1
+
+
 # 6 - Loop forever
 while True:
     # 7 - Check for and handle events
@@ -50,7 +58,11 @@ while True:
             mouse_pos = pygame.mouse.get_pos()
             if ballRect.collidepoint(mouse_pos):
                 player_score += 1
-                print("clicked ball!")
+                ballRect.left = random.randint(0, MAX_WIDTH)
+                ballRect.top = random.randint(0, MAX_HEIGHT)
+                # using sign so that the ball doesn't always go to the bottom-right after clicked
+                xSpeed = sign(xSpeed) * (abs(xSpeed) + random.randint(1, 5))
+                ySpeed = sign(ySpeed) * (abs(ySpeed) + random.randint(1, 5))
 
     # 8 - Do any "per frame" actions
     if (ballRect.left < 0) or (ballRect.right >= WINDOW_WIDTH):
@@ -60,6 +72,9 @@ while True:
     if (ballRect.top < 0) or (ballRect.bottom >= WINDOW_HEIGHT):
         ySpeed = -ySpeed  # reverse Y direction
         bounceSound.play()
+
+    if player_score == 5:
+        break
 
     # Update the rectangle of the ball, based on the speed in two directions
     ballRect.left = ballRect.left + xSpeed
