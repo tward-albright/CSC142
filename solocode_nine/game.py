@@ -83,37 +83,13 @@ class Game:
         oCard = self.cardList[index]
         oCard.reveal()
 
-    def hitHigherOrLower(self, higherOrLower):
-        self.cardNumber = self.cardNumber + 1
-        self.showCard(self.cardNumber)
-        nextCardName, nextCardValue = self.getCardNameAndValue(self.cardNumber)
+    # the player hits
+    def hit(self):
+        pass
 
-        if higherOrLower == HIGHER:
-            if nextCardValue > self.currentCardValue:
-                self.score = self.score + Game.POINTS_CORRECT
-                self.messageText.setValue("Yes, the " + nextCardName + " was higher")
-                self.winnerSound.play()
-            else:
-                self.score = self.score - Game.POINTS_INCORRECT
-                self.messageText.setValue("No, the " + nextCardName + " was not higher")
-                self.loserSound.play()
-
-        else:  # user hit the Lower button
-            if nextCardValue < self.currentCardValue:
-                self.score = self.score + Game.POINTS_CORRECT
-                self.messageText.setValue("Yes, the " + nextCardName + " was lower")
-                self.winnerSound.play()
-            else:
-                self.score = self.score - Game.POINTS_INCORRECT
-                self.messageText.setValue("No, the " + nextCardName + " was not lower")
-                self.loserSound.play()
-
-        self.scoreText.setValue("Score: " + str(self.score))
-
-        self.currentCardValue = nextCardValue  # set up for the next card
-
-        done = self.cardNumber == (Game.NCARDS - 1)  # did we reach the last card?
-        return done
+    # the player stands
+    def stand(self):
+        pass
 
     def draw(self):
         # Tell each card to draw itself

@@ -25,8 +25,8 @@ background = pygwidgets.Image(window, (0, 0), "images/background.png")
 newGameButton = pygwidgets.TextButton(
     window, (20, 530), "New Game", width=100, height=45
 )
-higherButton = pygwidgets.TextButton(window, (540, 520), "Higher", width=120, height=55)
-lowerButton = pygwidgets.TextButton(window, (340, 520), "Lower", width=120, height=55)
+stayButton = pygwidgets.TextButton(window, (540, 520), "Stay", width=120, height=55)
+hitButton = pygwidgets.TextButton(window, (340, 520), "Hit", width=120, height=55)
 quitButton = pygwidgets.TextButton(window, (880, 530), "Quit", width=100, height=45)
 
 # 5 - Initialize variables
@@ -46,20 +46,20 @@ while True:
 
         if newGameButton.handleEvent(event):
             oGame.reset()
-            lowerButton.enable()
-            higherButton.enable()
+            stayButton.enable()
+            hitButton.enable()
 
-        if higherButton.handleEvent(event):
-            gameOver = oGame.hitHigherOrLower(HIGHER)
+        if hitButton.handleEvent(event):
+            gameOver = oGame.hit()
             if gameOver:
-                higherButton.disable()
-                lowerButton.disable()
+                hitButton.disable()
+                stayButton.disable()
 
-        if lowerButton.handleEvent(event):
-            gameOver = oGame.hitHigherOrLower(LOWER)
+        if stayButton.handleEvent(event):
+            gameOver = oGame.stand()
             if gameOver:
-                higherButton.disable()
-                lowerButton.disable()
+                hitButton.disable()
+                stayButton.disable()
 
     # 8 - Do any "per frame" actions
 
@@ -71,8 +71,8 @@ while True:
     oGame.draw()
     # Draw remaining user interface components
     newGameButton.draw()
-    higherButton.draw()
-    lowerButton.draw()
+    hitButton.draw()
+    stayButton.draw()
     quitButton.draw()
 
     # 11 - Update the window
