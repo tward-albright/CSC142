@@ -18,10 +18,8 @@ class Game:
     def __init__(self, window):
         self.window = window
         self.deck = Deck(self.window, rankValueDict=constants.blackJackDict)
-        self.player_total = 0
         self.player_holder = CardHolder(300, 25)
-        self.dealer_total = 0
-        self.dealer_holder = CardHolder(150, 25)
+        self.dealer_holder = CardHolder(125, 25)
         self.standing = False
 
         self.messageText = pygwidgets.DisplayText(
@@ -46,7 +44,7 @@ class Game:
 
         self.dealerScore = pygwidgets.DisplayText(
             window,
-            (25, 175),
+            (25, 100),
             "",
             width=900,
             justified="left",
@@ -67,6 +65,7 @@ class Game:
         self.standing = False
         self.cardShuffleSound.play()
         self.player_holder.cards = []
+        self.dealer_holder.cards = []
         self.deck.shuffle()
         for cardIndex in range(0, Game.NCARDS):  # deal out cards
             self.draw_card(self.player_holder)
@@ -80,8 +79,8 @@ class Game:
         self.messageText.setValue(
             f"Starting card is {self.currentCardName}. Hit or stand?"
         )
-        self.playerScore.setValue(f"Player Score: {self.player_total}")
-        self.dealerScore.setValue(f"Dealer Score: {self.dealer_total}")
+        self.playerScore.setValue(f"Player Score: {self.player_holder.total}")
+        self.dealerScore.setValue(f"Dealer Score: {self.dealer_holder.total}")
 
     def getCardNameAndValue(self, index):
         oCard = self.player_holder.cards[index]
@@ -100,10 +99,10 @@ class Game:
         xpos = location.card_left + Game.CARD_OFFSET * (len(location.cards) - 1)
         card.setLoc((xpos, location.card_top))
         card.reveal()
-        self.player_total += card.getValue()
-        print(self.player_total)
+        location.total += card.getValue()
+        print(location.total)
 
-        self.playerScore.setValue(f"Player Score: {self.player_total}")
+        self.playerScore.setValue(f"Player Score: {self.player_holder.total}")
 
     # the player hits
     def hit(self):
@@ -113,20 +112,32 @@ class Game:
             f"Drawn card is {self.currentCardName}. Hit or stand?"
         )
 
-        if self.player_total > 21:
+        if self.player_holder.total > 21:
             print("Busted!")
             self.messageText.setValue("Player Busted!")
-            self.stand()
 
     # the player stands
     def stand(self):
         self.standing = True
-        pass
+        while (
+            self.dealer_holder.total < 17
+            and self.dealer_holder.total < self.player_holder.total
+        ):
+            self.draw_card(self.dealer_holder)
+            self.dealerScore.setValue(f"Dealer Score: {self.dealer_holder.total}")
+
+        if self.dealer_holder.total < self.player_holder.total:
+            self.messageText.setValue("Dealer Wins!")
+        else:
+            self.messageText.setValue("Player Wins!")
 
     def draw(self):
         # Tell each card to draw itself
         for oCard in self.player_holder.cards:
             oCard.draw()
+
+        for card in self.dealer_holder.cards:
+            card.draw()
 
         self.messageText.draw()
         self.playerScore.draw()

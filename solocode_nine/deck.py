@@ -60,6 +60,7 @@ class CardHolder:
         self.card_top = card_top
         self.card_left = card_left
         self.cards = []
+        self.total = 0
 
 
 if __name__ == "__main__":
