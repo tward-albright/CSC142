@@ -66,6 +66,8 @@ class Game:
         self.cardShuffleSound.play()
         self.player_holder.cards = []
         self.dealer_holder.cards = []
+        self.player_holder.total = 0
+        self.dealer_holder.total = 0
         self.deck.shuffle()
         for cardIndex in range(0, Game.NCARDS):  # deal out cards
             self.draw_card(self.player_holder)
@@ -115,6 +117,7 @@ class Game:
         if self.player_holder.total > 21:
             print("Busted!")
             self.messageText.setValue("Player Busted!")
+            self.standing = True
 
     # the player stands
     def stand(self):
