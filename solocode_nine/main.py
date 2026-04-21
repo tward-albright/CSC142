@@ -51,13 +51,13 @@ while True:
 
         if hitButton.handleEvent(event):
             gameOver = oGame.hit()
-            if gameOver:
+            if gameOver or oGame.standing:
                 hitButton.disable()
                 stayButton.disable()
 
         if stayButton.handleEvent(event):
             gameOver = oGame.stand()
-            if gameOver:
+            if gameOver or oGame.standing:
                 hitButton.disable()
                 stayButton.disable()
 

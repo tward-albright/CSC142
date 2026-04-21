@@ -1,32 +1,28 @@
 #  Game class
 
+import pygame
 import pygwidgets
 
-from card import *
-from constants import *
-from deck import *
+import constants
+from deck import CardHolder, Deck
 
 
 class Game:
     CARD_OFFSET = 110
     CARDS_TOP = 300
-    CARDS_LEFT = 75
-    NCARDS = 8
+    CARDS_LEFT = 25
+    NCARDS = 2
     POINTS_CORRECT = 15
     POINTS_INCORRECT = 10
 
     def __init__(self, window):
         self.window = window
-        self.oDeck = Deck(self.window)
-        self.score = 100
-        self.scoreText = pygwidgets.DisplayText(
-            window,
-            (450, 164),
-            "Score: " + str(self.score),
-            fontSize=36,
-            textColor=WHITE,
-            justified="right",
-        )
+        self.deck = Deck(self.window, rankValueDict=constants.blackJackDict)
+        self.player_total = 0
+        self.player_holder = CardHolder(300, 25)
+        self.dealer_total = 0
+        self.dealer_holder = CardHolder(150, 25)
+        self.standing = False
 
         self.messageText = pygwidgets.DisplayText(
             window,
@@ -35,31 +31,45 @@ class Game:
             width=900,
             justified="center",
             fontSize=36,
-            textColor=WHITE,
+            textColor=constants.WHITE,
+        )
+
+        self.playerScore = pygwidgets.DisplayText(
+            window,
+            (25, 275),
+            "",
+            width=900,
+            justified="left",
+            fontSize=24,
+            textColor=constants.WHITE,
+        )
+
+        self.dealerScore = pygwidgets.DisplayText(
+            window,
+            (25, 175),
+            "",
+            width=900,
+            justified="left",
+            fontSize=24,
+            textColor=constants.WHITE,
         )
 
         self.loserSound = pygame.mixer.Sound("sounds/loser.wav")
         self.winnerSound = pygame.mixer.Sound("sounds/ding.wav")
         self.cardShuffleSound = pygame.mixer.Sound("sounds/cardShuffle.wav")
 
-        self.cardXPositionsList = []
-        thisLeft = Game.CARDS_LEFT
-        # Calculate the x positions of all cards, once
-        for cardNum in range(Game.NCARDS):
-            self.cardXPositionsList.append(thisLeft)
-            thisLeft = thisLeft + Game.CARD_OFFSET
+        self.player_card_positions = []
+        self.dealer_car_positions = []
 
         self.reset()  # start a round of the game
 
     def reset(self):  # this method is called when a new round starts
+        self.standing = False
         self.cardShuffleSound.play()
-        self.cardList = []
-        self.oDeck.shuffle()
+        self.player_holder.cards = []
+        self.deck.shuffle()
         for cardIndex in range(0, Game.NCARDS):  # deal out cards
-            oCard = self.oDeck.getCard()
-            self.cardList.append(oCard)
-            thisXPosition = self.cardXPositionsList[cardIndex]
-            oCard.setLoc((thisXPosition, Game.CARDS_TOP))
+            self.draw_card(self.player_holder)
 
         self.showCard(0)
         self.cardNumber = 0
@@ -68,33 +78,56 @@ class Game:
         )
 
         self.messageText.setValue(
-            "Starting card is "
-            + self.currentCardName
-            + ". Will the next card be higher or lower?"
+            f"Starting card is {self.currentCardName}. Hit or stand?"
         )
+        self.playerScore.setValue(f"Player Score: {self.player_total}")
+        self.dealerScore.setValue(f"Dealer Score: {self.dealer_total}")
 
     def getCardNameAndValue(self, index):
-        oCard = self.cardList[index]
+        oCard = self.player_holder.cards[index]
         theName = oCard.getName()
         theValue = oCard.getValue()
         return theName, theValue
 
     def showCard(self, index):
-        oCard = self.cardList[index]
+        oCard = self.player_holder.cards[index]
         oCard.reveal()
+
+    def draw_card(self, location: CardHolder):
+        card = self.deck.getCard()
+        self.currentCardName = card.cardName
+        location.cards.append(card)
+        xpos = location.card_left + Game.CARD_OFFSET * (len(location.cards) - 1)
+        card.setLoc((xpos, location.card_top))
+        card.reveal()
+        self.player_total += card.getValue()
+        print(self.player_total)
+
+        self.playerScore.setValue(f"Player Score: {self.player_total}")
 
     # the player hits
     def hit(self):
-        pass
+        self.draw_card(self.player_holder)
+
+        self.messageText.setValue(
+            f"Drawn card is {self.currentCardName}. Hit or stand?"
+        )
+
+        if self.player_total > 21:
+            print("Busted!")
+            self.messageText.setValue("Player Busted!")
+            self.stand()
 
     # the player stands
     def stand(self):
+        self.standing = True
         pass
 
     def draw(self):
         # Tell each card to draw itself
-        for oCard in self.cardList:
+        for oCard in self.player_holder.cards:
             oCard.draw()
 
-        self.scoreText.draw()
         self.messageText.draw()
+        self.playerScore.draw()
+        self.dealerScore.draw()

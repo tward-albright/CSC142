@@ -2,7 +2,7 @@
 
 import random
 
-from card import *
+from card import Card
 
 
 class Deck:
@@ -27,8 +27,8 @@ class Deck:
     def __init__(self, window, rankValueDict=STANDARD_DICT):
         # rankValueDict defaults to STANDARD_DICT, but you can call
         # with a different dict, e.g., a special dict for Blackjack
-        self.startingDeckList = []
-        self.playingDeckList = []
+        self.startingDeckList: list[Card] = []
+        self.playingDeckList: list[Card] = []
         for suit in Deck.SUIT_TUPLE:
             for rank, value in rankValueDict.items():
                 oCard = Card(window, rank, suit, value)
@@ -53,6 +53,13 @@ class Deck:
     def returnCardToDeck(self, oCard):
         # Put a card back into the deck
         self.playingDeckList.insert(0, oCard)
+
+
+class CardHolder:
+    def __init__(self, card_top, card_left):
+        self.card_top = card_top
+        self.card_left = card_left
+        self.cards = []
 
 
 if __name__ == "__main__":
